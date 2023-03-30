@@ -1,0 +1,120 @@
+spring:
+  liquibase:
+    change-log: classpath:config/liquibase/master.xml
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${URL_DB:localhost}:${PORT_DB:5432}/${DB_NAME:queueReceiver}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+      maximum-pool-size: 10
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database: DEFAULT
+    show-sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  #Config RABBIT MQ
+  rabbitmq:
+    port: ${RABBITMQ_PORT:5672}
+    host: ${RABBITMQ_URL:localhost}
+    username: ${RABBITMQ_USER:user}
+    password: ${RABBITMQ_PASSWORD:password}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:cpp}
+    directExchange: ${RABBITMQ_DIRECT_EXCHANGE_NAME:ibm.master.system}
+    queues:
+      personalQueue:
+        queueCrewpv: ${SAP_ADP_MS_CREWPV:SAP.ADP.MS.CREWPV}
+        queueCommondata: ${SAP_ADP_MS_COMMONDATA:SAP.ADP.MS.COMMONDATA}
+        queueId: ${SAP_ADP_MS_ID:SAP.ADP.MS.ID}
+        queueMed: ${SAP_ADP_MS_MED:SAP.ADP.MS.MED}
+        queueVac: ${SAP_ADP_MS_VAC:SAP.ADP.MS.VAC}
+        queueVacationleftovers: ${SAP_ADP_MS_VACATIONLEFTOVERS:SAP.ADP.MS.VACATIONLEFTOVERS}
+        queueHrmd: ${SAP_ADP_MS_HRMD:SAP.ADP.MS.HRMD}
+        crewpvRoutingkey: ${CREWPV_ROUTING_KEY:crewpv.routingkey}
+        commondataRroutingkey: ${COMMONDATA_ROUTING_KEY:commondata.routingkey}
+        idRoutingkey: ${ID_ROUTING_KEY:id.routingkey}
+        medRoutingkey: ${MED_ROUTING_KEY:med.routingkey}
+        vacRoutingkey: ${VAC_ROUTING_KEY:vac.routingkey}
+        vacationleftoversRoutingkey: ${VACATIONLEFTOVERS_ROUTING_KEY:vacationleftovers.routingkey}
+        hrmdRoutingkey: ${HRMD_ROUTING_KEY:hrmd.routingkey}
+      schedulerQueue:
+        queueForScheduler: ${QUEUE_FOR_SCHEDULER:queue-ibm-event-scheduler}
+        routingKeyForScheduler: ${QUEUE_FOR_SCHEDULER:scheduler}
+
+server:
+  port: 8080
+
+
+#Config IBM MQ
+ibm:
+  files.location: ${HOME}/data/
+  mq:
+    host: ${IMB_MQ_HOST:localhost}
+    port: ${IBM_MQ_PORT:1414}
+    user: ${IBM_MQ_USER:admin}
+    password: ${IBM_MQ_PWD:passw0rd}
+    queueManager: ${IBM_MQ_MANAGER:QMAFLCERT}
+    crewcn:
+      channel: ${CREW_IMB_CHANNEL:DEV.ADMIN.SVRCONN}
+      queues: >
+        ${QUEUES:
+        ROSTERS.OUT,
+        SSMUTC.OUT,
+        SSIMFULL.OUT,
+        QUAL.OUT,
+        LEAVEINFO.OUT,
+        HRMD.OUT,
+        CREWPV.OUT,
+        ID.OUT,
+        COMMONDATA.OUT,
+        MED.OUT,
+        VAC.OUT,
+        VACATIONLEFTOVERS.OUT}
+    eco:
+      channel: ${ECO_IMB_CHANNEL:DEV.ADMIN.SVRCONN}
+      queues: >
+        ${ECO.QUEUES:
+        AP_SCHED.OUT,
+        QUAL_PD.OUT,
+        PREASSIGN.OUT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        step: 60
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    tags:
+      application: ${spring.application.name}
+
+web:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+    max-age: 3600
+    allowed-headers: Requestor-Type, Content-Type
+    exposed-headers: X-Get-Header
+
+keycloak:
+  auth-server-url: http://localhost:8092/auth
+  realm: development
+  resource: local_app
+  public-client: true
+  cors: true

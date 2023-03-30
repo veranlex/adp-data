@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  ibmmq:
+    image: 'docker.io/ibmcom/mq'
+    container_name: ibmmq
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QMAFLCERT
+#      ICC_SHIFT need enable for custom amd cpu
+      - ICC_SHIFT=3
+    ports:
+      - '1414:1414'
+      - '9442:9443'
+    volumes:
+      - ./20-config.mqsc:/etc/mqm/20-config.mqsc

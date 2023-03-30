@@ -1,0 +1,43 @@
+stages:
+  - build
+  - deploy
+
+
+build:
+  stage: build
+  image: gradle:7.6.1-jdk17
+  script:
+    - chmod 775 gitlab/*.sh
+    - ./gitlab/build.sh
+  artifacts:
+    paths:
+      - build/libs
+    expire_in: 1 hour
+  tags:
+    - gradle7
+  only:
+    refs:
+      - merge_requests
+      - develop
+      - develope
+      - master
+
+
+deploy:
+  stage: deploy
+  variables:
+    IMAGE_NAME: '$DOCKER_REGISTRY_URL/cpp/$CI_PROJECT_NAME'
+  before_script:
+    - docker login -u nx-publisher -p nx-publisher $DOCKER_REGISTRY_URL
+  script:
+    - chmod 775 gitlab/*.sh
+    - ./gitlab/deploy.sh
+  dependencies:
+    - build
+  tags:
+    - docker
+  only:
+    refs:
+      - develop
+      - develope
+      - master

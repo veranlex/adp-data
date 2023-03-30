@@ -1,0 +1,36 @@
+pluginManagement {
+    plugins {
+        id 'org.springframework.boot' version '2.7.8'
+        id 'org.liquibase.gradle' version '2.0.3'
+        id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    }
+    resolutionStrategy {
+    }
+    repositories {
+        maven {
+            allowInsecureProtocol = true
+            url NEXUS_PLUGINS_URL
+        }
+    }
+}
+
+gradle.ext.VERSION='1.0-SNAPSHOT'
+
+
+
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            allowInsecureProtocol = true
+            url NEXUS_URL
+        }
+        maven {
+            allowInsecureProtocol = true
+            url NEXUS_RELEASE_URL
+        }
+        maven {
+            allowInsecureProtocol = true
+            url NEXUS_SNAPSHOT_URL
+        }
+    }
+}
